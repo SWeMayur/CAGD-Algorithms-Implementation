@@ -63,5 +63,5 @@ If you'd like to contribute to this project, please follow these steps:
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE.md). Feel free to use, modify, and distribute the code as per the terms of the license.
+This project is licensed under the [Center For Computational Technologies (CCTech)]((https://www.cctech.co.in/)). Feel free to use, modify, and distribute the code as per the terms of the license.
 
