@@ -38,7 +38,6 @@ Before you begin, ensure you have met the following requirements:
 
     ```bash
     git clone https://github.com/SWeMayur/CAGD-Algorithms-Implementation
-    cd yourproject
     ```
 
 2. **Build the Project:**
