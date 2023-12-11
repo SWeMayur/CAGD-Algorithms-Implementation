@@ -34,8 +34,6 @@ void OpenGLWindow::reset()
     QObject::disconnect(mContextWatchConnection);
 }
 
-
-
 void OpenGLWindow::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -57,11 +55,12 @@ void OpenGLWindow::paintGL()
     vertices << -2.75 << -2.75;
     vertices << 2.5 << 1.5;
 
-    colors << 0.0f << 1.0f << 0.0f;
-    colors << 0.0f << 1.0f << 0.0f;
+    colors << 1.0f << 0.0f << 0.0f;
+    colors << 1.0f << 0.0f << 0.0f;
   
     QVector<QVector2D> squareVertices;
-    bresenhamLinePixels(-2.75, -2.75, 2.5, 1.5, squareVertices);
+    //bresenhamLinePixels(-2.75, -2.75, 2.5, 1.5, squareVertices);
+    SymmetricDDA(-2.75, -2.75, 2.5, 1.5, squareVertices);
     int i = 0;
     while (i < squareVertices.size()) {
         QVector<QVector2D> qv;
@@ -73,7 +72,7 @@ void OpenGLWindow::paintGL()
         i++;
         qv.append(squareVertices[i]);
         i++;
-        QVector3D fillColor(1.0f, 0.0f, 1.0f);  // Yellow color
+        QVector3D fillColor(1.0f, 1.0f, 0.0f);  // Yellow color
         fillSquare(qv, fillColor);
     }
     
@@ -153,8 +152,6 @@ void OpenGLWindow::fillSquare(const QVector<QVector2D>& squareVertices, const QV
 void OpenGLWindow::bresenhamLinePixels(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelVertices)
 {
     // Bresenham's line drawing algorithm
-
-
     float dx = abs(x2 - x1);
     float dy = abs(y2 - y1);
     float sx = (x1 < x2) ? 1.0f : -1.0f;
@@ -181,6 +178,39 @@ void OpenGLWindow::bresenhamLinePixels(float x1, float y1, float x2, float y2, Q
         }
     }
 }
+
+void OpenGLWindow::SymmetricDDA(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelVertices)
+{
+    float dx = abs(x2 - x1);
+    float dy = abs(y2 - y1);
+    float deltaX;
+    float deltaY;
+    if (dy > dx)
+    {
+        deltaX = dx / dy;
+        deltaY = dy / dy;
+    }
+    else
+    {
+        deltaX = dx / dx;
+        deltaY = dy / dx;
+    }
+    while (x1 < x2)
+    {
+        pixelVertices.append(QVector2D(round(x1), round(y1)));
+        pixelVertices.append(QVector2D(round(x1) + 1, round(y1)));
+        pixelVertices.append(QVector2D(round(x1) + 1, round(y1) + 1));
+        pixelVertices.append(QVector2D(round(x1), round(y1) + 1));
+        x1 = deltaX + x1;
+        y1 = deltaY + y1;
+    }
+}
+
+
+
+
+
+
 
 /*void OpenGLWindow::paintGL()
 {
