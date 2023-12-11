@@ -26,6 +26,7 @@ private:
     void drawGrid(QVector<GLfloat>& vertices, QVector<GLfloat>& colors);
     void fillSquare(const QVector<QVector2D>& squareVertices, const QVector3D& fillColor);
     void bresenhamLinePixels(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelCoordinates);
+    void SymmetricDDA(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelVertices);
 private:
     bool mAnimating = false;
     QOpenGLContext* mContext = nullptr;
