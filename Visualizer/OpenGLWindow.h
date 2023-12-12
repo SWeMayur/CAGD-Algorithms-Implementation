@@ -19,7 +19,6 @@ public:
 protected:
     void paintGL() override;
     void initializeGL() override;
-
 private:
     void createGeometry();
     void reset();
@@ -48,4 +47,19 @@ private:
     GLint m_posAttr = 0;
     GLint m_colAttr = 0;
     GLint m_matrixUniform = 0;
+    float mFloatInputs[4];
+    QInputDialog* mInputBox;
+public slots:
+    void getUserInput();
 };
+
+
+
+
+
+
+
+
+
+
+
