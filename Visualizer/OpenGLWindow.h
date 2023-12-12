@@ -2,6 +2,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
+#include "Line.h"
 
 class QOpenGLTexture;
 class QOpenGLShader;
@@ -20,9 +21,9 @@ protected:
     void paintGL() override;
     void initializeGL() override;
 private:
-    void createGeometry();
+   // void createGeometry();
     void reset();
-    void drawGrid(QVector<GLfloat>& vertices, QVector<GLfloat>& colors);
+    void drawGrid(QVector<GLfloat>& vertices, QVector<GLfloat>& colors, float gridSize);
     void fillSquare(const QVector<QVector2D>& squareVertices, const QVector3D& fillColor);
     void bresenhamLinePixels(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelCoordinates);
     void SymmetricDDA(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelVertices);
@@ -48,18 +49,10 @@ private:
     GLint m_colAttr = 0;
     GLint m_matrixUniform = 0;
     float mFloatInputs[4];
-    QInputDialog* mInputBox;
+    Line *mLine;
+    int gridSize = 0;
+   // QInputDialog* mInputBox;
 public slots:
     void getUserInput();
+    void getGridInput();
 };
-
-
-
-
-
-
-
-
-
-
-
