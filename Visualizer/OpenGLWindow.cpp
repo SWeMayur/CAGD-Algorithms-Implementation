@@ -3,6 +3,9 @@
 #include <QOpenGLContext>
 #include <QOpenGLPaintDevice>
 #include <QOpenGLShaderProgram>
+#include "Grid.h"
+#include "Bresenhams.h"
+#include "SymmetricDDA.h"
 
 OpenGLWindow::OpenGLWindow(const QColor& background, QMainWindow* parent) : 
     mBackground(background)
@@ -57,13 +60,15 @@ void OpenGLWindow::paintGL()
     QVector<GLfloat> colors;
 
     // Draw the grid
-    drawGrid(vertices, colors, gridSize);
+    Grid grid(vertices, colors, gridSize);
+
     
     float v1 = mFloatInputs[0];
     float v2 = mFloatInputs[1];
     float v3 = mFloatInputs[2];
     float v4 = mFloatInputs[3];
-
+    
+    
     vertices << v1 << v2;
     vertices << v3 << v4;
     //vertices << -2.75 << -2.75;
@@ -74,9 +79,11 @@ void OpenGLWindow::paintGL()
   
     QVector<QVector2D> squareVertices;
 
+    Line l(Point2D(mFloatInputs[0], mFloatInputs[0]), Point2D(mFloatInputs[2], mFloatInputs[3]));
+    Bresenhams bresenhamsLineAlgo(l, squareVertices);
 
-    bresenhamLinePixels(v1, v2, v3, v4, squareVertices);
-    //SymmetricDDA(v1, v2, v3, v4, squareVertices);
+    //SymmetricDDA dda(l, squareVertices);
+
     int i = 0;
     while (i < squareVertices.size()) {
         QVector<QVector2D> qv;
@@ -92,12 +99,9 @@ void OpenGLWindow::paintGL()
         fillSquare(qv, fillColor);
     }
     
-    // Prepare the data for rendering
-    GLfloat* verticesData = vertices.data();
-    GLfloat* colorsData = colors.data();
 
-    glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, verticesData);
-    glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, colorsData);
+    glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, vertices.data());
+    glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, colors.data());
 
     glEnableVertexAttribArray(m_posAttr);
     glEnableVertexAttribArray(m_colAttr);
@@ -108,31 +112,6 @@ void OpenGLWindow::paintGL()
     glDisableVertexAttribArray(m_posAttr);
 }
 
-void OpenGLWindow::drawGrid(QVector<GLfloat>& vertices, QVector<GLfloat>& colors, float gridSize)
-{
-    //const float gridSize = 8.0f;  // Adjust the grid size as needed
-    const float step = 1.0f;
-
-    // Draw horizontal grid lines
-    for (float y = -gridSize / 2.0f; y <= gridSize / 2.0f; y += step)
-    {
-        vertices << -gridSize / 2.0f << y;
-        vertices << gridSize / 2.0f << y;
-
-        colors << 1.0f << 1.0f << 1.0f;
-        colors << 1.0f << 1.0f << 1.0f;
-    }
-
-    // Draw vertical grid lines
-    for (float x = -gridSize / 2.0f; x <= gridSize / 2.0f; x += step)
-    {
-        vertices << x << -gridSize / 2.0f;
-        vertices << x << gridSize / 2.0f;
-
-        colors << 1.0f << 1.0f << 1.0f;
-        colors << 1.0f << 1.0f << 1.0f;
-    } 
-}
 
 
 void OpenGLWindow::fillSquare(const QVector<QVector2D>& squareVertices, const QVector3D& fillColor)
@@ -165,61 +144,7 @@ void OpenGLWindow::fillSquare(const QVector<QVector2D>& squareVertices, const QV
     glDisableVertexAttribArray(m_posAttr);
 }
 
-void OpenGLWindow::bresenhamLinePixels(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelVertices)
-{
-    // Bresenham's line drawing algorithm
-    float dx = abs(x2 - x1);
-    float dy = abs(y2 - y1);
-    float sx = (x1 < x2) ? 1.0f : -1.0f;
-    float sy = (y1 < y2) ? 1.0f : -1.0f;
-    float err = dx - dy;
 
-   while (x1 < x2 || y1 < y2) {
-        pixelVertices.append(QVector2D(round(x1), round(y1)));
-        pixelVertices.append(QVector2D(round(x1) + 1, round(y1)));
-        pixelVertices.append(QVector2D(round(x1) + 1, round(y1) + 1));
-        pixelVertices.append(QVector2D(round(x1), round(y1) + 1));
-
-        float e2 = 2 * err;
-        if (e2 > -dy) {
-            err -= dy;
-            x1 += sx;
-            x1 = round(x1);
-        }
-        if (e2 < dx) {
-            err += dx;
-            y1 += sy;
-            y1 = round(y1);
-        }
-    } 
-}
-
-void OpenGLWindow::SymmetricDDA(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelVertices)
-{
-    float dx = abs(x2 - x1);
-    float dy = abs(y2 - y1);
-    float deltaX;
-    float deltaY;
-    if (dy > dx)
-    {
-        deltaX = dx / dy;
-        deltaY = dy / dy;
-    }
-    else
-    {
-        deltaX = dx / dx;
-        deltaY = dy / dx;
-    }
-    while (x1 < x2)
-    {
-        pixelVertices.append(QVector2D(round(x1), round(y1)));
-        pixelVertices.append(QVector2D(round(x1) + 1, round(y1)));
-        pixelVertices.append(QVector2D(round(x1) + 1, round(y1) + 1));
-        pixelVertices.append(QVector2D(round(x1), round(y1) + 1));
-        x1 = deltaX + x1;
-        y1 = deltaY + y1;
-    }
-}
 
 void OpenGLWindow::getUserInput() {
     bool ok;
@@ -243,17 +168,16 @@ void OpenGLWindow::getUserInput() {
 }
 void OpenGLWindow::getGridInput() {
     bool ok;
-    // Get a multi-line text input from the user
-    QString inputText = QInputDialog::getMultiLineText(this, "User Input", "Enter gridSize (integer):", "", &ok);
+    // Get a single-line integer input from the user
+    int n = QInputDialog::getInt(this, "User Input", "Enter gridSize (integer):", 0, INT_MIN, INT_MAX, 1, &ok);
     if (ok) {
-        // Parse the input string into 4 float values        
-         bool conversionOk;
-         gridSize = inputText.toInt(&conversionOk);
-         if (!conversionOk) {
-               return;
-         }
-    } 
+        gridSize = n;
+    }
+    else {
+        return;
+    }
 }
+
 
 void OpenGLWindow::initializeGL()
 {
@@ -287,14 +211,3 @@ void OpenGLWindow::initializeGL()
     Q_ASSERT(m_matrixUniform != -1);
 
 }
-//
-//void OpenGLWindow::createGeometry()
-//{
-//   /* mVertices.clear();
-//    mNormals.clear();
-//
-//    mVertices << QVector3D(0.0f, 0.707f, -0.05f);
-//    mVertices << QVector3D(-0.5f, -0.5f, -0.05f);
-//    mVertices << QVector3D(0.5f, -0.5f, -0.05f);
-//    */
-//}
