@@ -36,6 +36,10 @@ void OpenGLWindow::reset()
 
 void OpenGLWindow::paintGL()
 {
+    QPushButton* inputButton = new QPushButton("Get User Input", this);
+    inputButton->setGeometry(QRect(QPoint(50, 25), QSize(150, 50)));
+    connect(inputButton, &QPushButton::released, this, &OpenGLWindow::getUserInput);
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     mProgram->bind();
@@ -51,16 +55,24 @@ void OpenGLWindow::paintGL()
 
     // Draw the grid
     drawGrid(vertices, colors);
-
-    vertices << -2.75 << -2.75;
-    vertices << 2.5 << 1.5;
+    
+    float v1 = mFloatInputs[0];
+    float v2 = mFloatInputs[1];
+    float v3 = mFloatInputs[2];
+    float v4 = mFloatInputs[3];
+    vertices << v1 << v2;
+    vertices << v3 << v4;
+    //vertices << -2.75 << -2.75;
+    //vertices << 2.5 << 1.5;
 
     colors << 1.0f << 0.0f << 0.0f;
     colors << 1.0f << 0.0f << 0.0f;
   
     QVector<QVector2D> squareVertices;
-    //bresenhamLinePixels(-2.75, -2.75, 2.5, 1.5, squareVertices);
-    SymmetricDDA(-2.75, -2.75, 2.5, 1.5, squareVertices);
+
+
+    //bresenhamLinePixels(v1, v2, v3, v4, squareVertices);
+    SymmetricDDA(v1, v2, v3, v4, squareVertices);
     int i = 0;
     while (i < squareVertices.size()) {
         QVector<QVector2D> qv;
@@ -158,8 +170,7 @@ void OpenGLWindow::bresenhamLinePixels(float x1, float y1, float x2, float y2, Q
     float sy = (y1 < y2) ? 1.0f : -1.0f;
     float err = dx - dy;
 
-    while (x1 <= x2 || y1 <= y2) {
-        //ordinates.push_back(std::make_pair(x1, y1));
+   while (x1 < x2 || y1 < y2) {
         pixelVertices.append(QVector2D(round(x1), round(y1)));
         pixelVertices.append(QVector2D(round(x1) + 1, round(y1)));
         pixelVertices.append(QVector2D(round(x1) + 1, round(y1) + 1));
@@ -176,7 +187,7 @@ void OpenGLWindow::bresenhamLinePixels(float x1, float y1, float x2, float y2, Q
             y1 += sy;
             y1 = round(y1);
         }
-    }
+    } 
 }
 
 void OpenGLWindow::SymmetricDDA(float x1, float y1, float x2, float y2, QVector<QVector2D>& pixelVertices)
@@ -206,8 +217,36 @@ void OpenGLWindow::SymmetricDDA(float x1, float y1, float x2, float y2, QVector<
     }
 }
 
+void OpenGLWindow::getUserInput() {
+    bool ok;
+    // Get a multi-line text input from the user
+    QString inputText = QInputDialog::getMultiLineText(this, "User Input", "Enter 4 float values (separated by spaces):", "", &ok);
 
+    if (ok) {
+        // Parse the input string into 4 float values
+        QStringList inputList = inputText.split(' ');
+        if (inputList.size() == 4) {
+            bool conversionOk;
+            for (int i = 0; i < 4; ++i) {
+                mFloatInputs[i] = inputList[i].toFloat(&conversionOk);
+                if (!conversionOk) {
+                    qDebug() << "Invalid input. Please enter valid float values.";
+                    return;
+                }
+            }
 
+            // Use mFloatInputs array as needed
+            qDebug() << "User input values: " << mFloatInputs[0] << ", " << mFloatInputs[1] << ", " << mFloatInputs[2] << ", " << mFloatInputs[3];
+        }
+        else {
+            qDebug() << "Invalid input. Please enter exactly 4 float values.";
+        }
+    }
+    else {
+        // User clicked Cancel
+        qDebug() << "User canceled input";
+    }
+}
 
 
 
