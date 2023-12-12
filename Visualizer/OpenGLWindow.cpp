@@ -3,13 +3,12 @@
 #include <QOpenGLContext>
 #include <QOpenGLPaintDevice>
 #include <QOpenGLShaderProgram>
-#include <QPainter>
 
 OpenGLWindow::OpenGLWindow(const QColor& background, QMainWindow* parent) : 
     mBackground(background)
 {
     setParent(parent);
-    setMinimumSize(500, 250);
+    setMinimumSize(900, 550);
 }
 OpenGLWindow::~OpenGLWindow()
 {
@@ -39,13 +38,17 @@ void OpenGLWindow::paintGL()
     QPushButton* inputButton = new QPushButton("Get User Input", this);
     inputButton->setGeometry(QRect(QPoint(50, 25), QSize(150, 50)));
     connect(inputButton, &QPushButton::released, this, &OpenGLWindow::getUserInput);
+    
+    QPushButton* gridButton = new QPushButton("Enter Grid Size", this);
+    gridButton->setGeometry(QRect(QPoint(250, 25), QSize(150, 50)));
+    connect(gridButton, &QPushButton::released, this, &OpenGLWindow::getGridInput);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
     mProgram->bind();
 
     QMatrix4x4 matrix;
-    matrix.ortho(-6.0f, 6.0f, -6.0f, 6.0f, 0.1f, 100.0f);  // Adjust the orthographic projection
+    matrix.ortho(-3.0f-(gridSize/2), 3.0f+(gridSize/2), -3.0f- (gridSize / 2), 3.0f+ (gridSize / 2), 0.1f, 100.0f);  // Adjust the orthographic projection
     matrix.translate(0, 0, -2);
 
     mProgram->setUniformValue(m_matrixUniform, matrix);
@@ -54,12 +57,13 @@ void OpenGLWindow::paintGL()
     QVector<GLfloat> colors;
 
     // Draw the grid
-    drawGrid(vertices, colors);
+    drawGrid(vertices, colors, gridSize);
     
     float v1 = mFloatInputs[0];
     float v2 = mFloatInputs[1];
     float v3 = mFloatInputs[2];
     float v4 = mFloatInputs[3];
+
     vertices << v1 << v2;
     vertices << v3 << v4;
     //vertices << -2.75 << -2.75;
@@ -71,8 +75,8 @@ void OpenGLWindow::paintGL()
     QVector<QVector2D> squareVertices;
 
 
-    //bresenhamLinePixels(v1, v2, v3, v4, squareVertices);
-    SymmetricDDA(v1, v2, v3, v4, squareVertices);
+    bresenhamLinePixels(v1, v2, v3, v4, squareVertices);
+    //SymmetricDDA(v1, v2, v3, v4, squareVertices);
     int i = 0;
     while (i < squareVertices.size()) {
         QVector<QVector2D> qv;
@@ -104,9 +108,9 @@ void OpenGLWindow::paintGL()
     glDisableVertexAttribArray(m_posAttr);
 }
 
-void OpenGLWindow::drawGrid(QVector<GLfloat>& vertices, QVector<GLfloat>& colors)
+void OpenGLWindow::drawGrid(QVector<GLfloat>& vertices, QVector<GLfloat>& colors, float gridSize)
 {
-    const float gridSize = 8.0f;  // Adjust the grid size as needed
+    //const float gridSize = 8.0f;  // Adjust the grid size as needed
     const float step = 1.0f;
 
     // Draw horizontal grid lines
@@ -230,143 +234,26 @@ void OpenGLWindow::getUserInput() {
             for (int i = 0; i < 4; ++i) {
                 mFloatInputs[i] = inputList[i].toFloat(&conversionOk);
                 if (!conversionOk) {
-                    qDebug() << "Invalid input. Please enter valid float values.";
                     return;
                 }
             }
-
-            // Use mFloatInputs array as needed
-            qDebug() << "User input values: " << mFloatInputs[0] << ", " << mFloatInputs[1] << ", " << mFloatInputs[2] << ", " << mFloatInputs[3];
-        }
-        else {
-            qDebug() << "Invalid input. Please enter exactly 4 float values.";
         }
     }
-    else {
-        // User clicked Cancel
-        qDebug() << "User canceled input";
-    }
+    
 }
-
-
-
-
-/*void OpenGLWindow::paintGL()
-{
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    mProgram->bind();
-
-    QMatrix4x4 matrix;
-    matrix.perspective(60.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-    matrix.translate(0, 0,-2);
-
-
-
-    mProgram->setUniformValue(m_matrixUniform, matrix);
-
-    static const GLfloat vertices[] = {
-        //Horizontal lines: 
-            -0.75f,  0.75f,            
-             0.75f,  0.75f,        
-            -0.75f,  0.50f,          
-             0.75f,  0.50f,           
-
-            -0.75f,  0.25f,            
-             0.75f,  0.25f,        
-            -0.75f,  0.00f,          
-             0.75f,  0.00f,           
-
-            -0.75f, -0.25f,            
-             0.75f,  -0.25f,        
-            -0.75f,  -0.50f,          
-             0.75f,  -0.50f,           
-             
-            -0.75f, -0.75f,            
-             0.75f, -0.75f,     
-
-        //Vertical lines:
-            
-            -0.75f,  0.75f,
-            -0.75f,  -0.75f,
-            -0.50f,  0.75f,
-             -0.50f,  -0.75f,
-
-            -0.25f,  0.75f,
-             -0.25f,  -0.75f,
-             0.00f,  0.75f,
-             0.00f,  -0.75f,
-
-             0.25f,  0.75f,
-             0.25f,  -0.75f,
-             0.50f,  0.75f,
-             0.50f,  -0.75f,
-
-             0.75f, 0.75f,
-             0.75f, -0.75f,
-
-             //input line:
-
-             -0.60, -0.60,
-             0.30, 0.60
-    };
-
-    static const GLfloat colors[] = {
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-
-        1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,
-        
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-    };
-
-    glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-    glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, colors);
-
-    glEnableVertexAttribArray(m_posAttr);
-    glEnableVertexAttribArray(m_colAttr);
-
-    //glDrawArrays(GL_LINES, 0, 2);
-
-    glDrawArrays(GL_LINES, 0, 30);
-
-
-    glDisableVertexAttribArray(m_colAttr);
-    glDisableVertexAttribArray(m_posAttr);
+void OpenGLWindow::getGridInput() {
+    bool ok;
+    // Get a multi-line text input from the user
+    QString inputText = QInputDialog::getMultiLineText(this, "User Input", "Enter gridSize (integer):", "", &ok);
+    if (ok) {
+        // Parse the input string into 4 float values        
+         bool conversionOk;
+         gridSize = inputText.toInt(&conversionOk);
+         if (!conversionOk) {
+               return;
+         }
+    } 
 }
-*/
 
 void OpenGLWindow::initializeGL()
 {
@@ -400,14 +287,14 @@ void OpenGLWindow::initializeGL()
     Q_ASSERT(m_matrixUniform != -1);
 
 }
-
-void OpenGLWindow::createGeometry()
-{
-   /* mVertices.clear();
-    mNormals.clear();
-
-    mVertices << QVector3D(0.0f, 0.707f, -0.05f);
-    mVertices << QVector3D(-0.5f, -0.5f, -0.05f);
-    mVertices << QVector3D(0.5f, -0.5f, -0.05f);
-    */
-}
+//
+//void OpenGLWindow::createGeometry()
+//{
+//   /* mVertices.clear();
+//    mNormals.clear();
+//
+//    mVertices << QVector3D(0.0f, 0.707f, -0.05f);
+//    mVertices << QVector3D(-0.5f, -0.5f, -0.05f);
+//    mVertices << QVector3D(0.5f, -0.5f, -0.05f);
+//    */
+//}
