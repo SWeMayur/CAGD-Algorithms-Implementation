@@ -3,14 +3,14 @@
 
 Bresenhams::Bresenhams(Line l, QVector<QVector2D>& pixelVertices)
 {
-	pixelData(l, pixelVertices);
+    pixelData(l, pixelVertices);
 }
 
 Bresenhams::~Bresenhams()
 {
 }
 
-void Bresenhams::pixelData(Line l, QVector<QVector2D>& pixelVertices) 
+void Bresenhams::pixelData(Line l, QVector<QVector2D>& pixelVertices)
 {
     // Bresenham's line drawing algorithm
     float x1 = l.getP1().x();
