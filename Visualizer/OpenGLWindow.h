@@ -3,7 +3,8 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
 #include "Line.h"
-
+#include <vector>
+#include "Point2D.h"
 
 class QOpenGLTexture;
 class QOpenGLShader;
@@ -43,6 +44,10 @@ private:
     void fillSquare(const QVector<QVector2D>& squareVertices, const QVector3D& fillColor);
     void colorSqr(QVector<QVector2D>& pixels);
     QVector<QVector2D> mPixelVertices;
+    QVector<GLfloat> baC;
+    QVector<GLfloat> heC;
+    QVector<GLfloat> curveVertices;
+    QVector<GLfloat> curveColors;
 
 public:
     QVector<GLfloat> vertices;
@@ -52,4 +57,6 @@ public:
     void addGrid(int size);
     void bresenhams(Line l);
     void symmetricDDA(Line l);
+    void bazierCurve(std::vector<Point2D> v);
+    void hermiteCurve(std::vector<Point2D> v);
 };
