@@ -7,13 +7,14 @@
 #include "Grid.h"
 #include "Bresenhams.h"
 #include "SymmetricDDA.h"
+#include "BazierCurve.h"
+#include "HermiteCurve.h"
 
-
-OpenGLWindow::OpenGLWindow(const QColor& background, QMainWindow* parent) :
+OpenGLWindow::OpenGLWindow(const QColor& background, QMainWindow* parent):
     mBackground(background)
 {
     setParent(parent);
-    setMinimumSize(300, 250);
+    setMinimumSize(720, 550);
 }
 
 OpenGLWindow::~OpenGLWindow()
@@ -38,29 +39,31 @@ void OpenGLWindow::reset()
 }
 
 void OpenGLWindow::paintGL()
-{   
+{
 
-    
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     mProgram->bind();
 
     QMatrix4x4 matrix;
-    matrix.ortho(-3.0f -(gridSize / 2), 3.0f+ (gridSize / 2), -3.0f- (gridSize / 2), 3.0f+(gridSize/2), 0.1f, 100.0f);
+    matrix.ortho(-3.0f - (gridSize / 2), 3.0f + (gridSize / 2), -3.0f - (gridSize / 2), 3.0f + (gridSize / 2), 0.1f, 100.0f);
     matrix.translate(0, 0, -2);
 
     mProgram->setUniformValue(m_matrixUniform, matrix);
-    
+
     Grid grid(vertices, colors, gridSize);
     colorSqr(mPixelVertices);
-    
-    glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, vertices.data());
-    glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, colors.data());
+
+
+    glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, curveVertices.data());
+    glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, curveColors.data());
+
 
     glEnableVertexAttribArray(m_posAttr);
     glEnableVertexAttribArray(m_colAttr);
 
-    glDrawArrays(GL_LINES, 0, vertices.size() / 2);
+    glDrawArrays(GL_LINES, 0, curveVertices.size() / 2);
 
     glDisableVertexAttribArray(m_colAttr);
     glDisableVertexAttribArray(m_posAttr);
@@ -79,10 +82,11 @@ void OpenGLWindow::colorSqr(QVector<QVector2D>& pixels)
         i++;
         qv.append(pixels[i]);
         i++;
-        QVector3D fillColor(1.0f, 0.0f, 1.0f);
+        QVector3D fillColor(1.0f, 1.0f, 0.0f);
         fillSquare(qv, fillColor);
     }
 }
+
 void OpenGLWindow::fillSquare(const QVector<QVector2D>& squareVertices, const QVector3D& fillColor)
 {
 
@@ -112,6 +116,7 @@ void OpenGLWindow::fillSquare(const QVector<QVector2D>& squareVertices, const QV
     glDisableVertexAttribArray(m_colAttr);
     glDisableVertexAttribArray(m_posAttr);
 }
+
 void OpenGLWindow::initializeGL()
 {
     static const char* vertexShaderSource =
@@ -144,8 +149,9 @@ void OpenGLWindow::initializeGL()
     Q_ASSERT(m_matrixUniform != -1);
 }
 
-void OpenGLWindow::addLine(Line l) 
+void OpenGLWindow::addLine(Line l)
 {
+
     vertices.push_back(l.getP1().x());
     vertices.push_back(l.getP1().y());
     vertices.push_back(l.getP2().x());
@@ -176,5 +182,44 @@ void OpenGLWindow::symmetricDDA(Line l)
     mPixelVertices.clear();
     SymmetricDDA s(l, mPixelVertices);
     colorSqr(mPixelVertices);
+    emit shapeUpdate();
+}
+
+void OpenGLWindow::bazierCurve(std::vector<Point2D> v)
+{
+
+    curveColors.clear();
+    curveVertices.clear();
+    BezierCurve baz(v, baC);
+    float maxSize = 0;
+    for (int i = 0; i < v.size(); i++) {
+        gridSize = std::max(maxSize, std::max(v[i].x(), v[i].y()));
+    }
+    gridSize *= 2;
+    for (int i = 0; i < baC.size() / 2; i++) {
+        curveColors << 1.0f << 0.0f << 0.0f;
+    }
+    for (int i = 0; i < baC.size(); i++) {
+        curveVertices.push_back(baC[i]);
+    }
+    emit shapeUpdate();
+}
+
+void OpenGLWindow::hermiteCurve(std::vector<Point2D> v)
+{
+    curveColors.clear();
+    curveVertices.clear();
+    HermiteCurve her(v, heC);
+    float maxSize = 0;
+    for (int i = 0; i < v.size(); i++) {
+        gridSize = std::max(maxSize, std::max(v[i].x(), v[i].y()));
+    }
+    gridSize *= 2;
+    for (int i = 0; i < heC.size()/2; i++) {
+        curveColors << 1.0f << 1.0f << 0.0f;
+    }
+    for (int i = 0; i < heC.size(); i++) {
+        curveVertices.push_back(heC[i]);
+    }
     emit shapeUpdate();
 }
