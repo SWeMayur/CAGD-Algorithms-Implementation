@@ -1,0 +1,2 @@
+#define SYMMETRICLINE_API __declspec(dllexport)
+#define SYMMETRICLINE_API __declspec(dllimport)
