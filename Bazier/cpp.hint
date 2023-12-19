@@ -1,0 +1,2 @@
+#define BAZIER_API __declspec(dllexport)
+#define BAZIER_API __declspec(dllimport)
