@@ -1,0 +1,5 @@
+﻿  BSpline.cpp
+C:\Users\Mayur Kapadnis\source\repos\Visualize\BSplineCurve\BSpline.cpp(41,15): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Users\Mayur Kapadnis\source\repos\Visualize\BSplineCurve\BSpline.cpp(45,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+     Creating library C:\Users\Mayur Kapadnis\source\repos\Visualize\x64\Debug\BSplineCurve.lib and object C:\Users\Mayur Kapadnis\source\repos\Visualize\x64\Debug\BSplineCurve.exp
+  BSplineCurve.vcxproj -> C:\Users\Mayur Kapadnis\source\repos\Visualize\x64\Debug\BSplineCurve.dll
