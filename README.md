@@ -1,7 +1,7 @@
 # CAGD-Algorithms-Implementation
 ## OpenGL C++ Project with CAGD Algorithms
 
-This project is a Qt-based C++ application that utilizes OpenGL for computer-aided geometrical design (CAGD). The implementation includes classic algorithms such as Bresenham's algorithm and symmetric DDA algorithm for efficient rendering.
+This project is a Qt-based C++ application that utilizes OpenGL for computer-aided geometrical design (CAGD). The implementation includes classic algorithms such as Bresenham's algorithm, symmetric DDA algorithm, Bazier curve, Hermite curve, BSpline curve etc. for efficient rendering.
 
 ## Table of Contents
 
@@ -21,6 +21,8 @@ The purpose of this project is to demonstrate the implementation of CAGD algorit
 
 - **Bresenham's Algorithm**: Efficient line drawing algorithm that minimizes computational overhead.
 - **Symmetric DDA Algorithm**: Digital Differential Analyzer for symmetric line drawing.
+- **Bazier curve and Hermite curve**: For curve drawing drawing.
+- **BSpline**: For making spline.
 - **OpenGL Rendering**: Utilizes the power of OpenGL for efficient and hardware-accelerated rendering.
 - **Qt Integration**: Designed as a Qt project for cross-platform compatibility.
 
