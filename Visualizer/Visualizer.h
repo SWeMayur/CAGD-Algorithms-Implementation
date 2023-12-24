@@ -3,7 +3,6 @@
 #include <QtWidgets/QMainWindow>
 #include "Visualize.h"
 #include "OpenGLWindow.h"
-//#include "SymmetricDDA.h"
 
 class OpenGLWindow;
 
@@ -15,13 +14,24 @@ public:
     Visualize(QWindow* parent = nullptr);
     ~Visualize();
 
-private:
-    void setupUi();
+public slots:
+    void addLine();
+    void addGrid();
+    void bresenhamsLine();
+    void symmetricDDALine();
+    void bazier();
+    void hermite();
+    void rotationAngle();
+
 
 public:
     QVector<QVector2D> mPixelVertices;
     QVector<GLfloat>   mVertices;
     QVector<GLfloat>   mColors;
+
+
+private:
+    void setupUi();
 
 private:
     OpenGLWindow* mRenderer;
@@ -32,6 +42,8 @@ private:
     QPushButton* mPushButton4;
     QPushButton* mPushButton5;
     QPushButton* mPushButton6;
+    QPushButton* mColorSelector;
+    QPushButton* mRotationAngle;
    
     QLineEdit* mLineEdit1;
     QLineEdit* mLineEdit2;
@@ -46,6 +58,7 @@ private:
     QLineEdit* mLineEdit11;
     QLineEdit* mLineEdit12;
     QLineEdit* mLineEdit13;
+    QLineEdit* mAngleInput;
    
     QLabel* mLabel1;
     QLabel* mLabel2;
@@ -60,14 +73,7 @@ private:
     QLabel* mLabel11;
     QLabel* mLabel12;
     QLabel* mLabel13;
+    QLabel* mAngleInputLabel;
 
 
-
-public slots:
-    void addLine();
-    void addGrid();
-    void bresenhamsLine();
-    void symmetricDDALine();
-    void bazier();
-    void hermite();
 };
