@@ -15,6 +15,8 @@ Visualize::Visualize(QWindow* parent) : QMainWindow(nullptr)
     connect(mPushButton4, &QPushButton::clicked, this, &Visualize::symmetricDDALine);
     connect(mPushButton5, &QPushButton::clicked, this, &Visualize::bazier);
     connect(mPushButton6, &QPushButton::clicked, this, &Visualize::hermite);
+    connect(mColorSelector, &QPushButton::clicked, mRenderer, &OpenGLWindow::selectCurveColor);
+    connect(mRotationAngle , &QPushButton::clicked, this, &Visualize::rotationAngle);
     connect(mRenderer, SIGNAL(shapeUpdate()), mRenderer, SLOT(update()));
 }
 
@@ -23,9 +25,10 @@ Visualize::~Visualize()
 
 }
 
-
 //Implimentation of UI
-void Visualize::setupUi() {
+void Visualize::setupUi() 
+{
+                                                                                              
     resize(1530, 785);
     mLabel1 = new QLabel(this);
     mLabel1->setObjectName("label");
@@ -83,6 +86,21 @@ void Visualize::setupUi() {
     mPushButton2->setText("Draw Line");
     mPushButton2->setGeometry(QRect(870, 0, 85, 50));
 
+    mAngleInputLabel = new QLabel(this);
+    mAngleInputLabel->setObjectName("label");
+    mAngleInputLabel->setText("angle");
+    mAngleInputLabel->setGeometry(QRect(1135, 0, 85, 20));
+
+    mAngleInput = new QLineEdit(this);
+    mAngleInput->setObjectName("lineEdit_6");
+    mAngleInput->setGeometry(QRect(1105, 25, 85, 20));
+
+    mRotationAngle = new QPushButton(this);
+    mRotationAngle->setObjectName("pushButton");
+    mRotationAngle->setText("Enter angle");
+    mRotationAngle->setGeometry(QRect(1200, 0, 85, 50));
+
+
     mPushButton3 = new QPushButton(this);
     mPushButton3->setObjectName("pushButton");
     mPushButton3->setText("Draw Line (Bresenhams)");
@@ -102,6 +120,11 @@ void Visualize::setupUi() {
     mPushButton6->setObjectName("pushButton");
     mPushButton6->setText("Hermite Curve");
     mPushButton6->setGeometry(QRect(1330, 80, 200, 30));
+    
+    mColorSelector = new QPushButton(this);
+    mColorSelector->setObjectName("pushButton");
+    mColorSelector->setText("Select color");
+    mColorSelector->setGeometry(QRect(1330, 180, 200, 30));
 
     mLabel6 = new QLabel(this);
     mLabel6->setObjectName("label");
@@ -175,8 +198,6 @@ void Visualize::setupUi() {
     mLineEdit13->setObjectName("lineEdit_13");
     mLineEdit13->setGeometry(QRect(1200, 500, 85, 30));
 
-
-
     
 
     mRenderer = new OpenGLWindow(QColor(0, 0, 0), this);
@@ -245,7 +266,8 @@ void Visualize::bazier() {
     mRenderer->bazierCurve(v);
 }
 
-void Visualize::hermite() {
+void Visualize::hermite() 
+{
     float x1 = mLineEdit6->text().toFloat();
     float y1 = mLineEdit7->text().toFloat();
     float x2 = mLineEdit8->text().toFloat();
@@ -262,4 +284,10 @@ void Visualize::hermite() {
     v.push_back(Point2D(x4, y4));
     
     mRenderer->hermiteCurve(v);
+}
+
+void Visualize::rotationAngle()
+{
+    GLfloat angle = mAngleInput->text().toFloat();
+    mRenderer->rotateObject(angle);
 }
