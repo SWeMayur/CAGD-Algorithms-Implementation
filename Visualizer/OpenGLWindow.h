@@ -20,13 +20,29 @@ public:
     OpenGLWindow(const QColor& background, QMainWindow* parent);
     ~OpenGLWindow();
 
+public:
+    QVector<GLfloat> vertices;
+    QVector<GLfloat> colors;
+    int gridSize;
+    void addLine(Line l);
+    void addGrid(int size);
+    void bresenhams(Line l);
+    void symmetricDDA(Line l);
+    void bazierCurve(std::vector<Point2D> v);
+    void hermiteCurve(std::vector<Point2D> v);
+    void rotateObject(GLfloat angle);
+
 protected:
     void paintGL() override;
     void initializeGL() override;
 
+private slots:
+    void shaderWatcher();
+public slots:
+    void selectCurveColor();
+
 private:
     void reset();
-
 
 private:
     QOpenGLShader* mVshader = nullptr;
@@ -44,19 +60,15 @@ private:
     void fillSquare(const QVector<QVector2D>& squareVertices, const QVector3D& fillColor);
     void colorSqr(QVector<QVector2D>& pixels);
     QVector<QVector2D> mPixelVertices;
-    QVector<GLfloat> baC;
-    QVector<GLfloat> heC;
+    std::vector<float> baC;
+    std::vector<float> heC;
     QVector<GLfloat> curveVertices;
     QVector<GLfloat> curveColors;
-
-public:
-    QVector<GLfloat> vertices;
-    QVector<GLfloat> colors;
-    int gridSize;
-    void addLine(Line l);
-    void addGrid(int size);
-    void bresenhams(Line l);
-    void symmetricDDA(Line l);
-    void bazierCurve(std::vector<Point2D> v);
-    void hermiteCurve(std::vector<Point2D> v);
+    QQuaternion rotationAngle;
+    QPoint lastPos;
+    void mouseMoveEvent(QMouseEvent* event);
+    QString readShader(QString filePath);
+    QFileSystemWatcher* mShaderWatcher;
+    GLfloat r, g, b, angle;
+    QPushButton *mColorSelector;
 };
