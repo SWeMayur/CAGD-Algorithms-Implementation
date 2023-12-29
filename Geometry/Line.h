@@ -8,8 +8,8 @@ public:
 	~Line();
 
 public:
-	Point2D getP1();
-	Point2D getP2();
+	Point2D getP1() const;
+	Point2D getP2() const;
 	void setP1(Point2D);
 	void setP2(Point2D);
 private:
