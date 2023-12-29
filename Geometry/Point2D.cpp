@@ -1,9 +1,7 @@
 #include "pch.h"
 #include "Point2D.h"
 
-Point2D::Point2D(float inX, float inY)
-    : mX(0),
-    mY(0)
+Point2D::Point2D(float inX, float inY) : mX(0), mY(0)
 {
     mX = inX;
     mY = inY;
@@ -13,12 +11,12 @@ Point2D::~Point2D()
 {
 }
 
-float Point2D::x()
+float Point2D::getX() const
 {
     return mX;
 }
 
-float Point2D::y()
+float Point2D::getY() const
 {
     return mY;
 }
