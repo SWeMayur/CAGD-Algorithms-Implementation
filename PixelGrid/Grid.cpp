@@ -2,16 +2,16 @@
 #include "Grid.h"
 
 
-Grid::Grid(std::vector<float>& vertices, std::vector<float>& colors, int gridSize)
+Grid::Grid(std::vector<float>& vertices, std::vector<float>& colors, const int gridSize)
 {
-    storeGrid(vertices, colors, gridSize);
+    initializeGrid(vertices, colors, gridSize);
 }
 
 Grid::~Grid()
 {
 }
 
-void Grid::storeGrid(std::vector<float>& vertices, std::vector<float>& colors, int gridSize) {
+void Grid::initializeGrid(std::vector<float>& vertices, std::vector<float>& colors, const int gridSize) {
     //const float gridSize = 8.0f;  // Adjust the grid size as needed
     const float step = 1.0f;
 
