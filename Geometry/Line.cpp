@@ -6,12 +6,12 @@ Line::Line(Point2D p1, Point2D p2) : mP1(p1), mP2(p2)
 }
 Line::~Line() {}
 
-Point2D Line::getP1()
+Point2D Line::getP1() const
 {
 	return mP1;
 }
 
-Point2D Line::getP2()
+Point2D Line::getP2() const
 {
 	return mP2;
 }
