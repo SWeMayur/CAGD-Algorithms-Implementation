@@ -20,7 +20,9 @@ The purpose of this project is to demonstrate the implementation of CAGD algorit
 ## Features
 
 - **Bresenham's Algorithm**: Efficient line drawing algorithm that minimizes computational overhead.
+- ![Bresenhams output](https://github.com/user-attachments/assets/6839e8aa-13df-462a-97df-c5d878dcf06e)
 - **Symmetric DDA Algorithm**: Digital Differential Analyzer for symmetric line drawing.
+![symetricDDA output](https://github.com/user-attachments/assets/20a8b552-1592-4c46-af9f-fa578553090b)
 - **Bazier curve and Hermite curve**: For curve drawing drawing.
 - **BSpline**: For making spline.
 - **OpenGL Rendering**: Utilizes the power of OpenGL for efficient and hardware-accelerated rendering.
